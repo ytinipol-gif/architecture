@@ -227,8 +227,9 @@ Web Browser
 # 13. Структура проекта
 Проект содержит следующие файлы:
 
-architecture-hw1 -> README.md
-                └>workspace.dsl
+architecture-hw1:
+1. README.md
+2. workspace.dsl
 
 README.md — описание системы и выбранного варианта
 workspace.dsl — архитектурная модель и диаграммы C4
