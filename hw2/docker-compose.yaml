@@ -1,0 +1,6 @@
+services:
+  event-api:
+    build: .
+    container_name: event-management-api
+    ports:
+      - "8000:8000"
