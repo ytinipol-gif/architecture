@@ -1,0 +1,563 @@
+openapi: 3.1.0
+info:
+  title: Система управления событиями
+  description: REST API для управления пользователями, событиями и регистрациями
+  version: 1.0.0
+paths:
+  /:
+    get:
+      tags:
+      - Сервис
+      summary: Root
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+  /api/v1/auth/register:
+    post:
+      tags:
+      - Аутентификация
+      summary: Регистрация пользователя
+      operationId: register_user_api_v1_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/auth/login:
+    post:
+      tags:
+      - Аутентификация
+      summary: Вход пользователя
+      operationId: login_user_api_v1_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/by-login:
+    get:
+      tags:
+      - Пользователи
+      summary: Поиск пользователя по логину
+      operationId: get_user_by_login_api_v1_users_by_login_get
+      parameters:
+      - name: login
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Login
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/search:
+    get:
+      tags:
+      - Пользователи
+      summary: Поиск пользователей по имени или фамилии
+      operationId: search_users_api_v1_users_search_get
+      parameters:
+      - name: mask
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Mask
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+                title: Response Search Users Api V1 Users Search Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/events:
+    post:
+      tags:
+      - События
+      summary: Создание события
+      operationId: create_event_api_v1_events_post
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreateRequest'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - События
+      summary: Получение списка событий
+      operationId: get_events_api_v1_events_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventResponse'
+                title: Response Get Events Api V1 Events Get
+  /api/v1/events/by-date:
+    get:
+      tags:
+      - События
+      summary: Поиск событий по дате
+      operationId: get_events_by_date_api_v1_events_by_date_get
+      parameters:
+      - name: date
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Date
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventResponse'
+                title: Response Get Events By Date Api V1 Events By Date Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/events/{event_id}/registrations:
+    post:
+      tags:
+      - Регистрации
+      summary: Регистрация пользователя на событие
+      operationId: register_for_event_api_v1_events__event_id__registrations_post
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/events/{event_id}/participants:
+    get:
+      tags:
+      - Регистрации
+      summary: Получение участников события
+      operationId: get_event_participants_api_v1_events__event_id__participants_get
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+                title: Response Get Event Participants Api V1 Events  Event Id  Participants
+                  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/users/me/events:
+    get:
+      tags:
+      - Регистрации
+      summary: Получение событий пользователя
+      operationId: get_my_events_api_v1_users_me_events_get
+      parameters:
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventResponse'
+                title: Response Get My Events Api V1 Users Me Events Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/events/{event_id}/registrations/me:
+    delete:
+      tags:
+      - Регистрации
+      summary: Отмена регистрации
+      operationId: cancel_registration_api_v1_events__event_id__registrations_me_delete
+      parameters:
+      - name: event_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Event Id
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    EventCreateRequest:
+      properties:
+        title:
+          type: string
+          title: Title
+          description: Название события
+          examples:
+          - Архитектурный митап
+        description:
+          type: string
+          title: Description
+          description: Описание события
+          examples:
+          - Обсуждение архитектуры
+        date:
+          type: string
+          title: Date
+          description: Дата события
+          examples:
+          - '2026-03-25'
+        location:
+          type: string
+          title: Location
+          description: Место проведения
+          examples:
+          - Москва
+      type: object
+      required:
+      - title
+      - description
+      - date
+      - location
+      title: EventCreateRequest
+    EventResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        title:
+          type: string
+          title: Title
+        description:
+          type: string
+          title: Description
+        date:
+          type: string
+          title: Date
+        location:
+          type: string
+          title: Location
+        organizer_id:
+          type: integer
+          title: Organizer Id
+      type: object
+      required:
+      - id
+      - title
+      - description
+      - date
+      - location
+      - organizer_id
+      title: EventResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    MessageResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - message
+      title: MessageResponse
+    RegistrationResponse:
+      properties:
+        user_id:
+          type: integer
+          title: User Id
+        event_id:
+          type: integer
+          title: Event Id
+        registration_date:
+          type: string
+          title: Registration Date
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - user_id
+      - event_id
+      - registration_date
+      - status
+      title: RegistrationResponse
+    TokenResponse:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+      type: object
+      required:
+      - access_token
+      title: TokenResponse
+    UserLoginRequest:
+      properties:
+        login:
+          type: string
+          title: Login
+          description: Логин
+          examples:
+          - maria
+        password:
+          type: string
+          title: Password
+          description: Пароль
+          examples:
+          - '123456'
+      type: object
+      required:
+      - login
+      - password
+      title: UserLoginRequest
+    UserRegisterRequest:
+      properties:
+        login:
+          type: string
+          title: Login
+          description: Логин пользователя
+          examples:
+          - maria
+        first_name:
+          type: string
+          title: First Name
+          description: Имя пользователя
+          examples:
+          - Мария
+        last_name:
+          type: string
+          title: Last Name
+          description: Фамилия пользователя
+          examples:
+          - Лемещенко
+        email:
+          type: string
+          format: email
+          title: Email
+          description: Email пользователя
+          examples:
+          - maria@gmail.com
+        password:
+          type: string
+          minLength: 6
+          title: Password
+          description: Пароль
+          examples:
+          - '123456'
+      type: object
+      required:
+      - login
+      - first_name
+      - last_name
+      - email
+      - password
+      title: UserRegisterRequest
+    UserResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        login:
+          type: string
+          title: Login
+        first_name:
+          type: string
+          title: First Name
+        last_name:
+          type: string
+          title: Last Name
+        email:
+          type: string
+          format: email
+          title: Email
+      type: object
+      required:
+      - id
+      - login
+      - first_name
+      - last_name
+      - email
+      title: UserResponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
