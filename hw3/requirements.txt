@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+PyJWT
+pydantic[email]
+pytest
+httpx
+email-validator
+psycopg[binary]
