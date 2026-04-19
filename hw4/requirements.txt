@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+PyJWT
+pydantic[email]
+pytest
+httpx
+email-validator
+pymongo
+mongomock
+
