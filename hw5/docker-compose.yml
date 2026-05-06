@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: events-mongo-hw5
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data_hw5:/data/db
+      - .:/scripts
+
+  redis:
+    image: redis:7.2
+    container_name: events-redis-hw5
+    restart: always
+    ports:
+      - "6380:6379"
+
+  api:
+    build: .
+    container_name: events-api-hw5
+    restart: always
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      MONGO_URL: mongodb://mongo:27017/
+      MONGO_DB_NAME: events_db
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8002:8000"
+
+volumes:
+  mongo_data_hw5:
+
